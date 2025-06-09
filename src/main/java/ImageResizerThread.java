@@ -2,13 +2,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class ImageResizer extends Thread {
+public class ImageResizerThread extends Thread {
     String pathToDstFolder;
     int newWidth;
     File[] filesAllImages;
     long start;
 
-    public ImageResizer(String pathToDstFolder, int newWidth, File[] filesAllImages, long start) {
+    public ImageResizerThread(String pathToDstFolder, int newWidth, File[] filesAllImages, long start) {
         this.pathToDstFolder = pathToDstFolder;
         this.newWidth = newWidth;
         this.filesAllImages = filesAllImages;
