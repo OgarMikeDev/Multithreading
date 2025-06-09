@@ -1,6 +1,6 @@
 import java.io.File;
 
-public class Main {
+public class MainRunnableAndThread {
     private static final String pathToSrcFolder = "src/main/resources/data/src_folder";
     private static final String pathToDstFolder = "src/main/resources/data/dst_folder";
     private static int newWidth = 300;
