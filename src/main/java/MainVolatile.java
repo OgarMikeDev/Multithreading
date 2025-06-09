@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class VolatileMain {
+public class MainVolatile {
     public static void main(String[] args) {
         Task task = new Task();
         new Thread(task).start();
