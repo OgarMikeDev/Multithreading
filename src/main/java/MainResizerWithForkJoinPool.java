@@ -10,8 +10,66 @@ public class MainResizerWithForkJoinPool {
     private static final int newWidth = 300;
     private static final int THRESHOLD = 10; // Минимальный размер чанка для обработки
 
-    public static void main(String[] args) {
+public static void main(String[] args) {
+    // Создаём папку для исходных файлов
+    File fileSrcFolder = new File(pathToSrcFolder);
+    
+    // Проверяем, существует ли папка с исходниками
+    if (!fileSrcFolder.exists() || !fileSrcFolder.isDirectory()) {
+        System.err.println("Ошибка: Папка с исходными файлами не найдена: " + pathToSrcFolder);
+        return;
     }
+    
+    // Получаем все WAV файлы из папки
+    File[] filesAllSounds = fileSrcFolder.listFiles((dir, name) -> 
+        name.toLowerCase().endsWith(".wav") || 
+        name.toLowerCase().endsWith(".aiff") || 
+        name.toLowerCase().endsWith(".au")
+    );
+    
+    // Проверяем, есть ли файлы
+    if (filesAllSounds == null || filesAllSounds.length == 0) {
+        System.err.println("Ошибка: В папке нет поддерживаемых аудиофайлов (.wav, .aiff, .au)");
+        return;
+    }
+    
+    // Создаём папку для результатов, если её нет
+    File dstFolder = new File(pathToDstFolder);
+    if (!dstFolder.exists()) {
+        dstFolder.mkdirs();
+    }
+    
+    // Разделяем файлы на 2 части для двух потоков
+    int middle = filesAllSounds.length / 2;
+    
+    // Первая половина файлов
+    File[] filesSounds1 = new File[middle];
+    System.arraycopy(filesAllSounds, 0, filesSounds1, 0, filesSounds1.length);
+    
+    // Вторая половина файлов
+    File[] filesSounds2 = new File[filesAllSounds.length - middle];
+    System.arraycopy(filesAllSounds, middle, filesSounds2, 0, filesSounds2.length);
+    
+    long start = System.currentTimeMillis();
+    
+    // Создаём и запускаем первый поток
+    ChangeQualitySound soundProcessor1 = new ChangeQualitySound(pathToDstFolder, newWidth, filesSounds1, start);
+    soundProcessor1.start();
+    
+    // Создаём и запускаем второй поток
+    ChangeQualitySound soundProcessor2 = new ChangeQualitySound(pathToDstFolder, newWidth, filesSounds2, start);
+    soundProcessor2.start();
+    
+    // Ожидаем завершения обоих потоков
+    try {
+        soundProcessor1.join();
+        soundProcessor2.join();
+    } catch (InterruptedException e) {
+        System.err.println("Ошибка при ожидании потоков: " + e.getMessage());
+    }
+    
+    System.out.println("Все аудиофайлы обработаны!");
+}
 }
 
 class ChangeQualitySound extends Thread {
