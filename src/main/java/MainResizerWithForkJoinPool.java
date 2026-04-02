@@ -1,9 +1,4 @@
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -33,20 +28,20 @@ class ChangeQualitySound extends Thread {
      */
 
     String pathToDstFolder;
-    File[] filesAllImages;
+    File[] filesAllSounds;
     long start;
 
-    public ChangeQualitySound(String pathToDstFolder, int newWidth, File[] filesAllImages, long start) {
+    public ChangeQualitySound(String pathToDstFolder, int newWidth, File[] filesAllSounds, long start) {
         this.pathToDstFolder = pathToDstFolder;
-        this.filesAllImages = filesAllImages;
+        this.filesAllSounds = filesAllSounds;
         this.start = start;
     }
 
     @Override
     public void run() {
         try {
-            for (File currentFileImage : filesAllImages) {
-                AudioInputStream originalAudioInputStream = AudioSystem.getAudioInputStream(currentFileImage);
+            for (File currentFileSound : filesAllSounds) {
+                AudioInputStream originalAudioInputStream = AudioSystem.getAudioInputStream(currentFileSound);
                 AudioFormat originAudioFormat = originalAudioInputStream.getFormat();
 
                 //TODO Новый формат с половинной частотой
@@ -63,7 +58,7 @@ class ChangeQualitySound extends Thread {
                 // Преобразование (упрощённо: прореживание сэмплов)
                 AudioInputStream converted = AudioSystem.getAudioInputStream(newAudioFormat, originalAudioInputStream);
 
-                File output = new File(pathToDstFolder + "/" + currentFileImage.getName());
+                File output = new File(pathToDstFolder + "/" + currentFileSound.getName());
                 AudioSystem.write(converted, AudioFileFormat.Type.WAVE, output);
             }
             long end = System.currentTimeMillis();
